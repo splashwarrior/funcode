@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define DEBUG	1
-#define LOG	1
+#define DEBUG	0
+#define LOG	0
 /* Hello */
 #define THREE	0
 #define LEN	9
@@ -67,6 +67,44 @@ void print_hash() {
 #endif
 
 }
+int check_diag(int x, int y) {
+    int ret = 0;
+    int i = 0;
+    int yless = 1, ymore = 0;
+    int xless = 1, xmore = 0;
+    //diag cur->top left
+    for (i = x-1; (i >= 0) && (y - yless >= 0); i--) {
+	if (grid[i][y - yless] == 1) {
+	    return  0;
+	}
+	yless++;
+    }
+    //diag cur->top right
+    ymore = 1;
+    for (i = x - 1; (i >= 0) && (y + ymore < LEN); i--) {
+	if (grid[i][y + ymore] == 1) {
+	    return 0;
+	}
+	ymore++;
+    }
+    //diag cur->bottom left
+    for (i = x+1; (i < LEN) && (y - yless >= 0); i++) {
+	if (grid[i][y - yless] == 1) {
+	    return  0;
+	}
+	yless++;
+    }
+    //diag cur->bottom right
+    ymore = 1;
+    for (i = x + 1; (i < LEN ) && (y + ymore < LEN); i++) {
+	if (grid[i][y + ymore] == 1) {
+	    return 0;
+	}
+	ymore++;
+    }
+
+    return 1;
+}
 
 int check_grid(int x, int y) {
 
@@ -77,7 +115,7 @@ int check_grid(int x, int y) {
 	printf("really row=%d col=%d\n", hashrow[x], hashcol[y]);
 	return 0;
     }
-    return 1;
+    return check_diag(x, y);;
 }
 
 int isFull(int *x, int *y) {
@@ -108,36 +146,39 @@ int isFull(int *x, int *y) {
 int solver() {
     int i = 0, j = 0;
     int valid = 0;
+    int col = 0;
 #if DEBUG
     printf("=======================SOLVER==============================\n");
 #endif
-    if (isFull(&i, &j)) {
-	printf("\n\n\t\tI SOLVED EVERYTHINGSolver with [%d][%d]\n", i, j);
+    if (isFull(&i, &col)) {
+	printf("\n\n\t\tI SOLVED EVERYTHINGSolver with [%d][%d]\n", i, col);
 	return 1;
     }
 #if DEBUG
-    printf("\n\n\t\tI [%d][%d]\n", i, j);
+    printf("\n\n\t\tI [%d][%d]\n", i, col);
 #endif
 
-    setnum_at_pos(1, i, j);
-    valid = check_grid(i, j);
-    if (!valid) {
+    for (j = col; j < LEN; j++) {
+	setnum_at_pos(1, i, j);
+	valid = check_grid(i, j);
+	if (!valid) {
 #if DEBUG
-	printf("Incorrect entry [%d][%d]\n",  i, j);
+	    printf("Incorrect entry [%d][%d]\n",  i, j);
 #endif
-    } else { //found one correct lets continue
+	} else { //found one correct lets continue
 #if DEBUG
-	printf("Correct entry [%d][%d]\n", i, j);
+	    printf("Correct entry [%d][%d]\n", i, j);
 #endif
-	valid = solver();
+	    valid = solver();
 #if DEBUG
-	printf("\t\tCalling solver with[%d][%d]\n", i, j+1);
+	    printf("\t\tCalling solver with[%d][%d]\n", i, j+1);
 #endif
-	if(valid) {
-	    return 1;
+	    if(valid) {
+		return 1;
+	    }
 	}
+	setnum_at_pos(INV, i, j);
     }
-    setnum_at_pos(INV, i, j);
     return 0;
 }
 
@@ -147,9 +188,9 @@ int main(int argc, char *argv[])
 
     print_grid();
     printf("\n\n");
-    setnum_at_pos(1, 0, 1);
-    setnum_at_pos(1, 2, 6);
-    setnum_at_pos(1, 4, 5);
+    ///setnum_at_pos(1, 0, 1);
+    setnum_at_pos(1, 2, 0);
+    //setnum_at_pos(1, 4, 5);
     solver();
     print_grid();
     return 0;
