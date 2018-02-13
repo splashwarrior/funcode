@@ -167,40 +167,15 @@ int main(int argc, char *argv[])
 {
     init();
 
-#if THREE 
-    setnum_at_pos(1, 0, 0);
-    setnum_at_pos(1, 1, 1);
-    setnum_at_pos(1, 2, 2);
-    setnum_at_pos(2, 0, 1);
-    setnum_at_pos(3, 1, 0);
-#endif
-#if 1//NINE 
-    setnum_at_pos(9, 0, 3);
-    setnum_at_pos(7, 0, 6);
-    setnum_at_pos(1, 1, 0);
-    setnum_at_pos(3, 1, 7);
-    setnum_at_pos(5, 2, 1);
-    setnum_at_pos(4, 2, 2);
-    setnum_at_pos(9, 2, 7);
-    setnum_at_pos(9, 3, 0);
-    setnum_at_pos(6, 3, 1);
-    setnum_at_pos(1, 3, 2);
-    setnum_at_pos(7, 4, 8);
-    setnum_at_pos(3, 5, 0);
-    setnum_at_pos(5, 5, 3);
-    setnum_at_pos(6, 5, 5);
-    setnum_at_pos(4, 5, 7);
-    setnum_at_pos(1, 6, 1);
-    setnum_at_pos(2, 6, 4);
-    setnum_at_pos(3, 6, 5);
-    setnum_at_pos(5, 6, 7);
-    setnum_at_pos(6, 6, 8);
-    setnum_at_pos(6, 7, 3);
-    setnum_at_pos(4, 7, 8);
-    setnum_at_pos(5, 8, 2);
-    setnum_at_pos(7, 8, 4);
-    setnum_at_pos(2, 8, 8);
-#endif
+    setnum_at_pos(8, 0, 0);
+    setnum_at_pos(7, 0, 1);
+    setnum_at_pos(1, 0, 2);
+    setnum_at_pos(4, 0, 4);
+    setnum_at_pos(7, 1, 5);
+    setnum_at_pos(2, 1, 6);
+    setnum_at_pos(7, 1, 5);
+    setnum_at_pos(7, 1, 5);
+    setnum_at_pos(7, 1, 5);
     //setnum_at_pos(3, 1, 0);
     print_grid();
     printf("\n\n");

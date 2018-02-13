@@ -1,0 +1,47 @@
+README: Dispatcher code for Brain Corp. (Siddhartha Agrawal)
+
+Build Instructions
+
+1. Unzip the agrawals_submission.zip
+2. "make test" will build the code as well as run the sample unit
+    test cases as well. The sample tests will run 5 different input
+    packets to the dispatcher().
+3. "make clean" will clean the folder. 
+4. To use the dispatcher API(dispatcher(uint8_t *pkt), you can simply
+   call the API with the pointer to the buffer/array. If the packet
+   type is valid, it will either print the ASCII string or read out
+   the float motor coordinates.
+5. Compiler Version: gcc (GCC) 4.8.5 20150623 
+
+
+Improvements
+
+1. The best way to scale would be to have an input stream(uint8_t*) 
+   where all the packets(display and motor) are sent together. i.e.
+   current behaviour is to individually call the dispatcher API for
+   each individual packet. The idea is to club multiple packets and
+   send it to the dispatcher API together. In the background, this
+   could be done either by queueing all the message packets in a 
+   single queue and have the dispatcher read till its empty. 
+2. Also, the current API relies that the user will always send the
+   correct length. 
+   a) In my testing, I have a usecase(commented code in
+   tests.c (bus_error) that causes the dispatcher to read memory, its
+   not supposed to that will cause bus errors resulting in a core
+   dump. In the current solution, I would have a hard MAX_STRING_LEN
+   that can potentially check if the user is sending malicious lengths.
+
+Files included
+
+1. Makefile: make options
+    make test - Compile code and run unit tests
+    make debug - Compile code with debug stats and run unit tests
+    make clean - Clean up the objects and binary
+2. dispatcher.c 
+   All dispatcher related logic, parsing packet and sample implementation
+   of the the update_motor and display_message functions. 
+3. dispatcher.h
+   Packet structure, enums and prototypes.
+4. tests.c
+   Sample envokation of the dispatcher function. Unit tests
+   to test valid/invalid data to the dispatcher API.

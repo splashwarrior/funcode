@@ -1,0 +1,103 @@
+#include "dispatcher.h"
+/* Test inputs*/
+uint8_t display_packet[] = {0x1, 0x34, 0x05, 0x0, 0x48, 0x65, 0x6c, 0x6c,
+    0x6f};
+uint8_t motor_packet[] = {0x2, 0x80, 0x08, 0x0, 0x0, 0x0, 0x80, 0x3f, 0x0,
+    0x0, 0x0, 0xbf};
+uint8_t error_packet[] = {};//0x2, 0x84, 0x07, 0x0, 0x0, 0x0, 0x80, 0x3f, 0x0,
+    //0x0, 0x0, 0xbf};
+
+/* 
+ * Function used to display the input data.
+ * Return: Void
+ * Args: struct packet_data_t pointer
+ */
+void display_message(struct packet_data_t *pdata) {
+    uint8_t *str = (uint8_t*) malloc(pdata->msg_len+1);
+    if (!str) {
+	printf("%s: Out of Memory for string\n", __func__);
+	return;
+    }
+
+    /* copy the message to a local string */
+    memcpy(str, pdata->msg_data, pdata->msg_len); 
+    /* input data might not be null terminated */
+    str[pdata->msg_len] = '\0';
+
+    printf("%s: ASCII string is \"%s\"\n", __func__, str);
+    /* Free the local buffer*/
+    free(str);
+}
+
+/* 
+ * Function used to display the motor data.
+ * Return: Void
+ * Args: struct packet_data_t pointer
+ */
+void update_motor(struct packet_data_t *pdata) {
+    float fwd_back, left_right;
+
+    /* msg len has to be 8 to read the motor data */
+    if (MOTOR_DATA_LEN == pdata->msg_len) {
+	fwd_back = *(float*)(pdata->msg_data);
+	left_right= *(((float *)pdata->msg_data) + 1);
+	printf("%s: update message fwd_back= %f left_right= %f\n", __func__, fwd_back, left_right);
+    } else {
+	printf("%s: update motor has incorrect length\n", __func__);
+    }
+}
+
+void dump_packet(struct packet_data_t *pdata) {
+#if DEBUG
+    printf("packet_id=%x\n", pdata->packet_id);
+    printf("type=%x\n", pdata->msg_type);
+    printf("len=%x\n\n", pdata->msg_len);
+#endif
+}
+
+int parse_packet(uint8_t * pkt, struct packet_data_t *pdata) {
+    if (!pdata || !pkt) {
+	printf("%s: Invalid input NULL pointer\n", __func__);
+	return -ERR_INV;
+    }
+    pdata->packet_id = pkt[0];
+    pdata->msg_type = pkt[1];
+    /* Assumption is little endian. */
+    pdata->msg_len = pkt[2] | pkt[3] << 8;
+    pdata->msg_data = &pkt[4];
+    
+    if (DISPLAY_MSG_HEADER == pdata->msg_type) {
+	display_message(pdata);
+    } else if (MOTOR_MSG_HEADER == pdata->msg_type) {
+	update_motor(pdata);
+    } else {
+	printf("%s: Invalid header\n", __func__);
+	return -ERR_INV;
+    }
+    dump_packet(pdata);
+    return 0;
+}
+
+int dispatcher(uint8_t *pkt) {
+    struct packet_data_t pdata;
+    int ret = -ERR_INV;
+
+    /* Check for null input */
+    if (!pkt)
+	return -ERR_INV;
+    printf("%x\n", *pkt);
+
+    /* Clear the struct before assignment */
+    memset(&pdata, 0, sizeof(pdata));
+    /*parse the input stream and fill pdata */
+    ret = parse_packet(pkt, &pdata);
+    return ret;
+}
+
+int main() {
+    printf("motor ret=%d\n", dispatcher(motor_packet));
+    printf("display ret=%d\n", dispatcher(display_packet));
+    printf("error  ret=%d\n", dispatcher(error_packet));
+
+    return 0;
+}
